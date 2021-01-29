@@ -1,0 +1,273 @@
+\documentclass[11pt]{article}
+%\usepackage{amsmath,amsthm,epsfig}
+\usepackage{amsthm,amsmath,amssymb,epsfig,graphicx,color,bbm}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{mathrsfs}
+
+\setlength{\oddsidemargin}{0in}
+\setlength{\textwidth}{6.3in}
+\setlength{\textheight}{9in}
+\setlength{\topmargin}{-0.65in}
+\def\T{{ \mathrm{\scriptscriptstyle T} }}
+\usepackage[dvipsnames]{xcolor}
+
+
+\newcommand{\wz}[1]{\textcolor{blue}{#1}}
+\newcommand{\rz}[1]{\textcolor{red}{\bf #1}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\newcommand{\trnp}{^\text{T}}
+
+\setlength\parindent{0pt}
+\usepackage{natbib}
+\bibliographystyle{agsm}
+
+\begin{document}
+
+\hrule
+\vspace*{0.02cm}
+\hrule
+\vspace*{1cm}
+{\Large \bf Response to Reviewers' Comments}
+\vspace*{1cm}
+\hrule
+\vspace*{0.5cm}
+\begin{tabular}{llp{11.5cm}}
+Manuscript No. & : & SIBS-D-20-00039 \\
+Title & : & Estimating Heterogeneous Treatment Effect on Multivariate Responses using Random Forests\\
+\end{tabular}
+\vspace*{0.5cm}
+\hrule
+\vspace*{0.02cm}
+\hrule
+
+\vspace*{1cm}
+
+First, we would like to thank you for handling this paper and thank the AE and both reviewers for their valuable comments. We have carefully addressed all the comments. Point-by-point responses are given below, where each comment is quoted in {\em italics}.
+
+\bigskip
+
+{\bf Response to Associate Editor}
+
+{\em GENERAL COMMENTS}
+
+{\em This paper develops a novel random forest approach to one of the most important questions in precision medicine—how to estimate the heterogeneous treatment effects for multivariate outcomes. The method is well motivated by the complete-feeding study design in food and nutrition microbiome research, thus it will be directly applicable to real microbiome studies and make important contributions to microbiome research. The paper is well written, explaining the rationale of the proposed method very well. The authors present extensive simulation studies and two real applications.\\
+
+For the final publication, we recommend the authors revising their paper according to the reviewers’ comments, adding more explanations about the objective function, listing the computation time and memory usage, discussing the possibility to generalize the current method to handle model misspecification scenarios, and expanding the explanations of the results of the real applications.
+}
+
+{\em
+\begin{itemize}
+    \item page 3, line 21, “such as (Zhang et al., 2012a…..)” to “such as Zhang et al 2012 a….”?
+    \item page 3, line 31, “collected in (xxx) and (xxx)” to “collected in xxx and xxx”?
+    \item rephrase page 5 line 34-35 “A tree-based method recursively utilize splitting rules to slice the feature space such that the treatment effects of all outcomes are relatively small”? The current sentence sounds a bit misleading or confusing. We want MOTEF to estimate the treatment effects of all outcomes as accurately as possible. The splitting rules just want to make the variation of the treatment effects of all outcomes within a node to be relatively small?
+    \item spell out WLOG for the first time when it is used?
+    \item page 9 line 14, “the two child notes” to “the two child nodes”
+    \item page 10 line 7, “Node here” to “Note here”
+\end{itemize}
+}
+
+\textbf{}
+
+{\bf Response:} Thanks for your comments! We want to summarize the major changes of our manuscript as a response to address these comments:
+
+\begin{itemize}
+    \item We updated the availability of the R package. The updated package is able to fit the proposed method within a minute for a moderate-sized dataset. Based on Reviewer \# 1's comment, we added more information at the end of the simulation result regarding the computational cost. Table 1 was updated to reflect the simulation result using the updated fast computing implementation. 
+    \item According to Reviewer \# 2's comment, we conducted the real data analysis again, incorporating the demographic information. The analysis results were updated in the manuscript accordingly, marked in red. 
+    \item According to Reviewer \# 1's comment, we rephrased the introduction section, specifically, Paragraph 4, 5 ,6, for clarity and brevity.
+    \item We removed previous Figure 3 and Figure 5, i.e. plots for feature importance. Instead, we added Table 3 and Table 4, which presents the same information and enhanced the readability.
+    \item We updated Figure 2 and Figure 3 (Previously Figure 4) to a colored version. Coloring was used to enhance the visibility of heterogeneity in the treatment effect.
+    \item We fixed additional typos and grammar errors, thanks to your comments.
+\end{itemize}
+
+\medskip
+
+\newpage
+{\bf Response to Reviewer \#1}
+
+We sincerely thank you for the valuable comments. We have carefully addressed all the comments. A point-by-point response is given below, where each of your comments is quoted in {\em italics}. \textbf{For a summary of major changes, please see our response to the Associate Editor. }
+
+\bigskip
+
+{\em GENERAL COMMENTS}
+
+\medskip
+
+{\em The manuscript describes a thorough and well-executed random forest model, namely MOTEF, which is suited to modeling the heterogeneous treatment effects simultaneously when the outcome is multivariate. Furthermore, the proposed method addresses a challenge in the complete feeding study design where microbiota is measured both before and after the food intervention. According to the results from numeric studies, it fully utilizes collected information and improves the accuracy of prediction. The analyses of this paper seem mostly correct, although there exist some shortages such as requiring restrictive constrains and incapability of time-invariant covariates, which are able to be solved based on authors' future strategies. Overall, the manuscript is clear and organized with well-explained derivations.}
+
+\medskip
+
+\textbf{Response:} Thank you!
+
+\bigskip
+
+{\em SPECIFIC COMMENTS}
+
+\medskip
+
+{\em Major issues:}
+
+\medskip
+
+{\em 1. In SECTION 3.1 MOTEF, the algorithm involves in optimization to find the best values of $\alpha, \beta$ and $\kappa$, how can you guarantee the optimal solutions always exist? It's better to give a explanation/prove that the objective function is convex.}
+
+\medskip
+
+\textbf{Response:} 
+
+Thank you for the comment. We would like to answer this from two perspective.
+
+First, you are entirely correct that from the generalized canonical correlation point of view, the Equation (4), defined on P. 8 of the manuscript, does not in general have a unique solution. Since such a formulation has been analyzed extensively in the existing literature, we feel that this issue is beyond this paper's scope, which focuses more on a methodology development of modeling two-stage multiple outcomes with treatment effects. 
+
+On the other hand, from a random forest perspective, uniqueness or optimality may not be a crucial issue. This is mainly because of the mechanism of random forests, which is allowed to involve a high degree of randomness and do not require an accurate model at each split. For example, in the original random forest algorithm, a binary split is used, which can be completely wrong about the underlying model. Nonetheless, the definition ($\alpha, \beta$ and $\kappa$) is not unique either since they are only required to fall into the column space induced from the parameter matrix $\boldsymbol\Gamma$ and $\boldsymbol\Gamma\mathbf{B}$, defined on Page 6. You are completely correct that there can be multiple solutions (if we re-parameterize them) to achieve maximization, even in a noiseless case. However, as we explained above, as long as those solutions effectively cut the feature space to reduce the variance of the treatment effect $\Delta Y$, the random forest model as a whole can work as intended.  
+
+\bigskip
+
+{\em 2. Most importantly, one of the major disadvantages faced by random forest is training a large number of deep trees can have high computational costs and use a lot of memory.\\
+However, in this manuscript, the efficiency of this algorithm is not analyzed. Moreover, in SECTION 4 Numeric Studies, the authors claimed future efforts will be spent on specializing the method for high-dimensional data, so it could be better to talk more about its performance, like how efficient it is when working on real dataset with less capacity, what is the current computation cost, etc. If it generally gives good performances on low-dimensional data, then we have the reason to move on.}
+
+\medskip
+
+\textbf{Response:} Thank you for point this out. To address your concern, we implemented the proposed algorithm in C++, based on the infrastructure provided by the \texttt{ranger}\citep{wright2015ranger} package. For the simulation described in Section 4, it takes less than 1 minute to fit on average. We also tested under the scenario where the dimension of the covariates and outcomes doubled, i.e. $p=20, q=6$. On average, the computation time increase to 1 minute and 15 seconds. This makes the method easy to use in practice. 
+
+\bigskip
+
+{\em Minor issues:}\\
+
+{\em 1.The Introduction does a good job on presenting some backgrounds but some parts, especially in the paragraph 4, would benefit from rephrasing for clarity and brevity.}
+
+\medskip
+
+\textbf{Response:} Thanks for the comment. We rephrased the introduction section, specifically, Paragraph 4, 5, and 6 of the Introduction section. The changes are marked in red. 
+
+\bigskip
+
+{\em 2. One last thing is about the figures. It won't be crucial issue but honestly speaking, it is not joyful to look at those figures, particularly Fig.5. Indistinguishable label make it really hard to read. Please try to modify the labels and colors.}
+
+\medskip
+
+\textbf{Response:} Thank you for the suggestion. We updated the previous Figures 3 and 5 as Table 2 and Table 3. We thought it would be appropriate to present the same information as a table so that genera names could be easily read. Meanwhile, we chose to present the top 5 important genera instead of all. Lastly, we updated the previously Figure 2 and Figure 4 to current Figure 2 and Figure 3, color coding the groups whose treatment effects are more similar within. We hope that could demonstrate the heterogeneity in treatment effect.
+
+\newpage
+{\bf Response to Reviewer \#2}
+
+We sincerely thank you for the valuable comments. We have carefully addressed all the comments. A point-by-point response is given below, where each of your comments is quoted in {\em italics}. \textbf{For a summary of major changes, please see our response to the Associate Editor. }
+
+\bigskip
+
+{\em GENERAL COMMENTS}
+
+{\em In this article, the authors proposed a forest-based method for heterogeneous treatment effects when there are multiple outcome variables. The method is developed for the study design where covariates and outcomes are measured before and after the intervention. The proposed methods were applied to two nutrition studies to evaluate the effects of food consumption on microbiota and biomarkers. My comments are as follows.}
+
+\medskip
+
+\textbf{Response:} Thanks for your comments!
+
+\bigskip
+
+{\em SPECIFIC COMMENTS}
+
+\medskip
+
+{\em Major issues:}
+
+\medskip
+
+{\em 1. From Figure 1, it seems that the effects on the response variables are fully mediated through the covariates. In other words, the method assumes
+the same model for $E(Y|X = x)$ before and after the treatment, which
+seems a fairly strong assumption. I am wondering whether the proposed
+method can be applied to or can be extended to a more general case where
+the changes in covariates do not fully explain the changes in response
+variables. Is it possible to allow $E(Y | X = x)$ to be different before and
+after treatment? For example, will assuming link functions $g(X^b)$ before
+the treatment and $g(X^e) + c$ after the treatment, where c is a constant
+vector, result in substantial methodological challenges? Some discussion
+might be helpful.}
+
+\medskip
+
+\textbf{Response:} Thank you for the comment. An interesting thing we did not illustrate in the original manuscript is that, although we assume $E(Y|X = x)$ to be the same at both stages, the method can still be applied to the case where the link function is $g(X^b)$ before the treatment and $g(X^e) + c$ after the treatment. This is because any constant changes in the response would not change the column space spanned by $\boldsymbol\Gamma$ and $\boldsymbol\Gamma\mathbf{B}$, hence do not change the multi-block CCA results. We can also see this through the treatment difference, defined as $E(\Delta Y | X^b = x, A = 1) - E(\Delta Y | X^b = x, A = 1)$. As the both $E(\Delta Y | X^b = x, A = 1)$ and $E(\Delta Y | X^b = x, A = 1)$ include this constant term $c$, it vanish when taking the difference. Such an effect is now explained in the new manuscript at the end of Section 2.1 on P. 7. 
+
+However, indeed, our model may not be able to deal with more complicated situations where the two link functions are completely different. However, based on our current biological understanding, that may not be a very realistic scenario to assume because we would expect the digest system to function similarly if all the necessary information has been collected. 
+
+
+\bigskip
+
+{\em 2. The definition of the parameter of interest in (1) does not involve $X^e$. Can one directly estimate $E(\Delta Y | X^b = x,A = a)$ using $(Y^b,Y^e, A, X^b)$ via some nonparametric methods? What is the benefit of introducing $X^e$ and the additional assumptions on the data generating process? It will be helpful to elaborate the use of $X^e$.}
+
+\medskip
+
+\textbf{Response:} Yes, it is possible to directly estimate $E(\Delta Y | X^b = x,A = a)$ without $X^e$. In this case, a multivariate random forest based on a simplified version of the proposed method's CCA step could be used. The covariate should including only $X^b$ and $\Delta Y$ to model the relationship. However, the key point here is that by incorporating the information of $X^e$ (which is a unique type of information available in complete feeding studies), the solution at each internal node is being regularized such that the treatment effect is only contained within the space of the parameter matrix of the link functions. Here the regularization means that we are encouraging the two link functions to be the same. By doing this, we hope to achieve a better prediction performance. 
+
+We also respectfully argue that even with a simplified version of our CCA step, i.e., only including $X^b$ and $\Delta Y A$, the proposed method still contributes to the literature about multivariate treatment effect prediction. 
+
+\bigskip
+
+{\em 3. In the data example, the covariates include gastrointestinal microbiota, and the response variables are biomarkers. Can the change in microbiota fully explain the change in biomarkers such as blood pressure? Also, was other patient information such as demographic factors used in the analysis? Although these factors may not change after the treatment, they seem to affect the response variables.}
+
+\medskip
+
+\textbf{Response:} Thank the reviewer for the comments. We re-did the analyses, incorporating available demographic variables in the model. Please see the updated results, marked in red, in the real data analysis section (P. 11-14). 
+
+
+Meanwhile, we want to note that handling demographic variables or covariates that are time-invariant requires additional assumptions on the microbiota-outcome pathway. Considering how rapid food and nutrition microbiome research progress, we respectfully argue deciding which pathway hypothesis is more credible is out of the scope of this work. Instead, our proposed framework covers many scenarios, including the followings:
+\begin{enumerate}
+    \item The treatment effect on the outcomes is independent of demographic variables. We acknowledge this is rarely realistic.
+    \item Demographic variables are upstream information of the microbiota. In this case, all the treatment effects of demographic variables are reflected in the change in the microbiota. Hence, modeling microbiota would consider the treatment effect due to demographic variables.
+    \item Demographic variables have effects on the link function, but not change in the microbiota change. To be specific, we may consider $\bm g(\bm x, \bm z)= \bm \gamma_0 + \bm \Gamma_x \bm x + \bm \Gamma_z \bm z$. The demographic variables $\bm z$ have effects on the link function that applies to both before and after treatment microbiome data. In this case, $\bm \Gamma_z \bm z$ cancels off when calculating $\Delta \bm Y$ like the coefficient $\bm \gamma_0$
+\end{enumerate}
+There are also cases where current implementation does not cover. When demographic variable causes treatment effect on microbiota, numerically, $\bm f(\bm x,a, \bm z) = \bm f_0(x) + a \boldsymbol \beta_0 + a\bm B_x \bm x + a\bm B_z \bm z$, and the link function the same as in the manuscript, Equation (1) is reformulated as
+
+\begin{align*}
+    & E(\Delta \bm{Y}|\bm X^b = \bm x, A = 1, Z= z) - E(\Delta \bm{Y}|\bm X^b = \bm x, A = -1, \bm Z=\bm z)\\
+    =& 2 \bm \Gamma \boldsymbol \beta_0 + 2 \bm \Gamma \bm B_x \bm x + 2 \bm \Gamma \bm B_z \bm z \\
+    =& E(\Delta \bm Y A | \bm X^b=\bm x, \bm Z =\bm z) = 2\bm\Gamma E(\Delta \bm X A| \bm X^b
+    =\bm x, \bm Z =\bm z).
+\end{align*}
+
+In this case, demographic variables should be included in the model. Nevertheless, the proposed algorithm still works with a modest modification. The Equation (4) changes to
+\begin{align*}
+\{\bm{\widehat{\alpha}}, \bm{\widehat{\beta}}, \bm{\widehat{\kappa}}\} = & \argmax\limits_{\lVert\alpha\rVert^2 = \lVert\beta\rVert^2 = \lVert\kappa\rVert^2 = 1}
+\Big[ \text{cov}( \bm \alpha\trnp (\bm{X}^b:\bm{Z}), \bm \beta \trnp \Delta \bm{X} A ) + \nonumber \\ 
+&\quad \text{cov} (\bm \alpha\trnp (\bm{X}^b:\bm{Z}), \bm \kappa \trnp \Delta \bm{Y} A) +\text{cov}(\bm \beta\trnp \Delta \bm{X} A, \bm \kappa\trnp \Delta \bm{Y} A ) \Big], \label{eqn:multiblock}
+\end{align*}
+where we bind $\bm{x}^b$ and $\bm{z}$ in the CCA step. This extended objective function is described in the real data analysis section on P.12.
+
+
+There might be more complicated pathway hypotheses. It can motivate future research on a more generalized model.
+
+
+\bigskip
+
+{\em 4. Can the authors provide more explanations on Figure 2 and 4? Some illustration on how these treatment effects are used in decision making will be helpful.}
+
+\medskip
+
+\textbf{Response:} Thanks for the comments. We added some explanation for Figure 2 and Figure 3 (Previously Figure 2 and Figure 5) to explain the spaghetti plot. Meanwhile, for each data analysis, we color-coded individuals into three groups that share similar treatment effects within. We hope this color coding can help illustrate the heterogeneity in the treatment effect. 
+
+
+For decision making illustration, we purposefully omitted it in the real data analysis section. The main focus of this work is treatment effect prediction instead of decision making. Hence, we didn't illustrate how treatment effects are used in decision making. A further reason is that the reward function for decision-making in a multivariate case can not be easily defined in the literature. As mentioned in the introduction section (P. 4, Line 15-18), unlike the univariate case, there is no single value function. It is possible to numerically multiply the treatment effect with a vector that quantifies the direction of improvement an individual prefer/need to mimic the single value reward function. However, we believe this vector is individual specific. In other words, individuals' demands are different. 
+%For example, Individual A would have Variable 1 increase and Variable 2 decrease, while Individual B would have both variable decreases. Therefore, we would like to leave the decision making to the user of the model who would know the demand.
+
+
+We provided information about decision making in the discussion section. We suggested treatment decision making is "given a direction where the improvement would be expected to happen, the better treatment could be decided by simply projecting the predicted individual treatment effect on the given direction." (P. 14, paragraph 3). Mathematically, given a direction vector $v_i \in \mathbb{R}^q$ for the $i$th individual, the decision favors Treatment 1 if $v_i^\prime*(\Delta \hat Y|x_i, T=1 - \Delta \hat Y|x_i, T=-1) > c$ where $c$ is a threshold. Otherwise, Treatment 2 is favored.
+
+
+We understand that our answer for decision making is not a definite answer. However, we would respectfully argue that individualized treatment decision should be tailoring individuals' needs. We would appreciate the understanding, and will work further for multivariate treatment effect presenting in an efficient fashion.
+
+\bigskip
+
+{\em Minor Comments:}\\
+{\em 
+1. Page 9, line 45: $Y^b and Y^e$ $\rightarrow$ $Y^b$ and $Y^e$\\
+2. Page 10, line 22: Geurts et al. (2006) $\rightarrow$ (Geurts et al., 2006)
+}
+
+\medskip
+
+\textbf{Response:} Thanks for pointing out these. The typo and grammar issues are addressed in the manuscript.
+
+
+\bibliographystyle{rss}
+\bibliography{reply_letter_ref}
+\end{document}
