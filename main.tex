@@ -18,7 +18,6 @@
 \algnewcommand\OUTPUT{\item[\textbf{Output:}]}%
 \algnewcommand\textproc{\textsc}
 \newcommand{\trnp}{^\text{T}}
-\newcommand{\bg}[1]{\textcolor{red}{#1}}
 
 
 
@@ -282,9 +281,7 @@ $$
 The blocked structure in both $\bm B$ and $\bm \Gamma$ will automatically impose a correlation structure on the multivariate outcomes. We use $p=10$ and $q = 3$ in all simulation settings. We use 400 training samples and 1000 testing samples in each setting. For penalized linear regression ($l_1$-PLS), we use the 10-fold cross-validation implemented in the \texttt{glmnet} package. For the marginal random forest method, the default tuning is used. For the proposed method, we set the number of trees to be 200, and use random splitting rules with 10 randomly generated cutting points at each node \citep{geurts2006extremely}. To evaluate the performance, we calculate the marginal mean squared error (MSE) of the estimated treatment effects across 200 iterations of the simulations and aggregate the errors overall outcome dimensions. All computation was conducted on a high-performance 64-bit Linux platform with 48 cores of 2.70GHz eight-core Intel Xeon E5-2680 processors with 24G of RAM per core and R 3.6.0 \citep{R2020}. All model fitting was run using a single core.
 
 \subsection{Simulation Result}\label{3.2}
-Simulation results are shown in Table \ref{SimRes}. Overall, models constructed using the proposed MOTEF have smaller aggregated prediction error than competing methods in nonlinear settings, i.e., either the treatment effect function or the link function is nonlinear. When both functions are linear, $l_1$-PLS model inevitably performs better (MSE = 0.21) than MOTEF (0.83) and Marginal RF (1.43). The advantage of using MOTEF is substantial when either function is nonlinear. When $f$ is linear and $g$ is polynomial, the MSE of MOTEF is 72\% and 88\% of the MSE from $l_1$-PLS and marginal RF, respectively. The discrepancy in performance is more obvious when the correlation structure exists in pre-treatment covariates. This is consistent with our splitting rule construction, which is intended to utilize the correlation structure among the multiple outcomes. Overall, the proposed MOTEF has 66\% and 87\% error compared with marginal RF when either of $\bm f$ and $\bm g$ is non-linear. And the advantage over the linear models is more significant. Computation wise, it takes, on average, less than 1 minute to fit the proposed model for the simulated datasets. 
-%cost are documented in Table \ref{CompRes}. The proposed method requires longer time and larger space to fit and store the model compared to the $l_1$-PLS and marginal RF. As the dimensional of the data increase, the advantage on storage size of Marginal RF over the proposed model MOTEF gradually shrinks. Overall, even though the proposed method takes longer time to fit, the computation time and required space is acceptable. The proposed method is feasible to use on a modern computer.
-
+Simulation results are shown in Table \ref{SimRes}. Overall, models constructed using the proposed MOTEF have smaller aggregated prediction error than competing methods in nonlinear settings, i.e., either the treatment effect function or the link function is nonlinear. When both functions are linear, $l_1$-PLS model inevitably performs better (MSE = 0.21) than MOTEF (0.83) and Marginal RF (1.43). The advantage of using MOTEF is substantial when either function is nonlinear. When $f$ is linear and $g$ is polynomial, the MSE of MOTEF is 72\% and 88\% of the MSE from $l_1$-PLS and marginal RF, respectively. The discrepancy in performance is more obvious when the correlation structure exists in pre-treatment covariates. This is consistent with our splitting rule construction, which is intended to utilize the correlation structure among the multiple outcomes. Overall, the proposed MOTEF has 66\% and 87\% error compared with marginal RF when either of $\bm f$ and $\bm g$ is non-linear. And the advantage over the linear models is more significant. Computation wise, it takes, on average, less than 1 minute to fit the proposed model for the simulated datasets.
 
 \section{Real Data Analysis}\label{realdata}
 We applied the proposed method to analyze two recent food and nutrition studies, almond consumption study by \citet{holscher2018almond} and avocado consumption study by \citet{Avocado}. Both studies were interested in examining how food consumption affects the composition of the gastrointestinal microbiota and host characteristics. 
@@ -325,7 +322,7 @@ In this paper, we propose a random forest framework to model the heterogeneous t
 
 Even though the proposed method's primary purpose is to model the treatment effect, many extensions could be easily accomplished, including treatment recommendation and subgroup analysis. The treatment recommendation is always based on a reward function of treatments \citep{qian2011performance}. The reward function is well-defined when the outcome is univariate. Nevertheless, defining the reward function for a multivariate outcome is non-trivial, especially when lacking domain knowledge. However, given a direction where the improvement would be expected to happen, the better treatment could be decided by simply projecting the predicted individual treatment effect on the given direction. On the other hand, subgroup analysis is also possible via a MOTEF model. Given the random forest kernel proposed by \cite{davies2014random}, the distance of samples can be calculated. A clustering step would yield similarity groups, which can be used to learn the underlying subgroups.
 
-The proposed model also has disadvantages. In our derivation, we require a randomized trial, which is slightly restrictive. However, this restriction can be lifted by adopting sampling weights. \cite{tian2014simple} provided theoretical justification for using the probability of treatment allocation as weights during model fitting. Secondly, the current implementation focuses on cases where covariates are time-sensitive, not directly applicable to studies that include time-invariant covariates, such as sex or race. A simple modification is to add the time-invariant variables in the pre-treatment covariate matrix $\textbf{X}^b$, but not in the difference matrix of covariate $\Delta \textbf{X}$. Thirdly, under high dimensional settings, the proposed loading estimations via the CCA could be numerically unstable in the lower level internal nodes, as the sample size is relevantly close to or smaller than the number of covariate or response dimensions. This forces the algorithm to stop, and would be detrimental to the accuracy of the prediction. We expect a regularized CCA algorithm to be able to address this. However, the computational cost might be greatly increased. %\bg{Lastly, the model assumption requires the before and post treatment link functions to be the same so that the borrowed information from post-treatment covariates can be used to regularize the solution space of CCA. This can be generalized to the degree that the two link functions differ by an constant term, for example, $g^b(x) = g(x)$ and $g^e(x) = g(x) + c$ for a constant $c$. Nevertheless, when the two functions are completely different, the improvement in treatment effect prediction are not studied yet. }
+The proposed model also has disadvantages. In our derivation, we require a randomized trial, which is slightly restrictive. However, this restriction can be lifted by adopting sampling weights. \cite{tian2014simple} provided theoretical justification for using the probability of treatment allocation as weights during model fitting. Secondly, the current implementation focuses on cases where covariates are time-sensitive, not directly applicable to studies that include time-invariant covariates, such as sex or race. A simple modification is to add the time-invariant variables in the pre-treatment covariate matrix $\textbf{X}^b$, but not in the difference matrix of covariate $\Delta \textbf{X}$. Thirdly, under high dimensional settings, the proposed loading estimations via the CCA could be numerically unstable in the lower level internal nodes, as the sample size is relevantly close to or smaller than the number of covariate or response dimensions. This forces the algorithm to stop, and would be detrimental to the accuracy of the prediction. We expect a regularized CCA algorithm to be able to address this. However, the computational cost might be greatly increased.
 
 Future efforts will be spent on specializing the method for high-resolution microbiome data analysis. Microbiome data are usually high-dimensional by nature. Analyzing high-resolution microbiome data would require a larger sample size under the current framework. Meanwhile, signals for OTUs are generally small, which would induce inefficient splits. Grouping weak effects using external biological information, such as a phylogenetic tree, could increase the power of detecting real associations \citep{peterson2016joint}, hence improving prediction accuracy. Incorporating the biological information into the joint modeling of the microbiome and outcomes in the CCA step would be a promising solution, where \citet{chen2013structure} would provide a helpful reference. 
 
@@ -337,12 +334,6 @@ Future efforts will be spent on specializing the method for high-resolution micr
 \section*{Code availability }
 The method has been implemented in a freely available R package MOTE.RF at \url{https://github.com/boyiguo1/MOTE.RF}.
 
-
-% Discussion of using repetitive measusres
-% As the price of data storage is close to negligible, it is a normal practice to collect data repeatedly over time. Different modelling strategies of the repeatedly measured data can easily lead to different estimations. Cross-sectional models produce different results from what longitudinal models produce. Hence, interpreting cross-sectional models in a longitudinal fashion will lead to a big problem. How to effectively model repeatedly measured data is of big concern, especially for precision medicine research.
-
-% Discussion of Interpretation
-% Interpretation for random forest models is difficult. Feature importance is a commonly used tool to interpret the predictors for random forest. In this article, we provided a feature importance algorithm, demonstrated with the almond assumption data.
 
 \clearpage
 
@@ -371,67 +362,12 @@ The method has been implemented in a freely available R package MOTE.RF at \url{
     \caption{Mean (SD) of aggregated prediction error of treatment effect.}\label{SimRes}
 \end{table}
 
-
-%%%%%%%%% Original Table One: correponding to R implementation of MOTE RF %%%%%%%%%%%%%%%%%%%%%%%%
-%\begin{table}[h]
-%    \centering
-%    \begin{tabular}{l l l c c c c}
-%    \hline
-%    & &    &\multicolumn{3}{@{}c@{}}{\textbf{Independent}} \\
-%    \cmidrule(lr){4-6}
-%    Setting & $f(x)$ & $g(x)$ & MOTEF & $l_1$-PLS & Marginal RF\\
-%    \hline
-%    1 & Linear & Linear & 0.93 (0.12) & 0.21 (0.05) & 1.42 (0.12) \\
-%    2 & Linear & Polynomial & 15.62 (1.56) & 23.26 (1.52) & 19.02 (1.51)\\
-%    3 & Polynomial & Linear & 37.5 (3.27) & 43.65 (3.02) & 59.77 (4.13)\\
-%    \hline
-%    & &    &\multicolumn{3}{@{}c@{}}{\textbf{Correlated}} \\
-%    \cmidrule(lr){4-6}
-%    Setting & $f(x)$ & $g(x)$ & MOTEF & $l_1$-PLS & Marginal RF\\
-%    \hline
-%    4 & Linear & Linear & 0.89 (0.11) & 0.2 (0.05) & 0.82 (0.1)\\
-%    5 & Linear & Polynomial & 17.31 (3.33) & 53.03 (6.04) & 31.24 (4.77)\\
-%    6 & Polynomial & Linear & 33.18 (7.19) & 130.52 (15.17) & 41.03 (7.44)\\
-%    \hline
-%    \end{tabular}                  
-%    \caption{Mean (SD) of aggregated prediction error of treatment effect.}\label{SimRes}
-%\end{table}
-
-
-
-
-
-%%%%%%% Computation Cost Table %%%%%%%%%%%%%%%%%%%%%%%
-%\begin{table}[h]
-%    \centering
-%\begin{tabular}{l l c c c c c c}
-%\hline
-%    & & \multicolumn{3}{@{}c@{}}{\textbf{Time (in seconds)}} & \multicolumn{3}{@{}c@{}}{\textbf{Size (in kilobytes)}}\\
-%    \cmidrule(lr){3-5}\cmidrule(lr){6-8}
-%p & q  & MOTEF & $l_1$-PLS  & Marginal RF & MOTEF &  $l_1$-PLS  & Marginal RF\\
-%\hline
-%10 & 3 & 50.103 & 0.006 & 0.879 & 32304.16 & 15.300 & 5669.32\\
-%20 & 6 & 74.155 & 0.010 & 3.363 & 19606.92 & 35.526 & 11238.22\\
-%\hline
-%\end{tabular}
-%   \caption{Mean computation time in seconds and object size in kilobytes, averaging over 200 iterations of 6 aforementioned simulation settings with different variable sizes.  For the proposed method, we set the number of trees to be 200, and use random splitting rules with 10 randomly generated cutting points at each node.For penalized linear regression ($l1$-PLS), we use the 10-fold cross-validation implemented in the \texttt{glmnet} package. For the marginal random forest method, the default tuning parameters in \texttt{randomForest} package are used.}\label{CompRes}
-%\end{table}
-
 \begin{figure}[h]
     \centering
     \includegraphics[width = %\textwidth]{Fig2_AlmondTreatmentEffect_V2.pdf}
     \textwidth]{Figures/Fig2_AlmondTreatmentEffect_V3.pdf}
     \caption{ Out of bag prediction of individualized treatment effect comparing almond diet to control diet. The serum inflammatory markers, including interleukin 6 level (IL6), C-reactive protein (CRP), serum amyloid A (SAA), soluble intercellular adhesion molecules (SICAM1, SVCAM1), are standardized. Each line represents an individual. K-mean clustering algorithm is applied to the predicted treatment effect of the 5 biomarkers, and generate 3 groups whose treatment effects of the five-dimensional outcome are similar within.}\label{AlmondPlot}
 \end{figure}
-
-
-
-%\begin{figure}[h]
-%    \centering
-%    \includegraphics[width = \textwidth]{Fig3_AlmondFI.pdf}
-%    \caption{Feature importance of the operational taxonomic units at the genus level in the almond consumption data analysis}\label{AlmondFI}
-%\end{figure}
-
 
 \begin{table}[h]
     \centering
@@ -449,36 +385,11 @@ Clostridia & Clostridiales & Lachnospiraceae & Ruminococcus & 0.17\\
 \caption{The top 5 important genera in the almond consumption data analysis. All of the top 5 important genera belong to the bacteria kingdom and the firmicutes phylum.}\label{AlmondFI}
 \end{table}
 
-%\begin{table}[h]
-%    \centering
-%\begin{tabular}{l l l l l c}
-%\hline
-%Phylum & Class & Order & Family & Genus & Relative\_Importance\\
-%\hline
-% Firmicutes & Clostridia & Clostridiales & Lachnospiraceae & unclassified & 1.00\\
-% Firmicutes & Clostridia & Clostridiales & Lachnospiraceae & Blautia & 0.78\\
-% Firmicutes & Clostridia & Clostridiales & Lachnospiraceae & Ruminococcus & 0.37\\
-% Firmicutes & Clostridia & Clostridiales & Ruminococcaceae & Ruminococcus & 0.26\\
-% Bacteroidetes & Bacteroidia & Bacteroidales & Porphyromonadaceae & Parabacteroides & 0.13\\
-%\hline
-%\end{tabular}
-%\caption{The top 5 important genera in the almond consumption data analysis. All genera belong to the bacteria kingdom.}\label{AlmondFI}
-%\end{table}
-
-
 \begin{figure}[h]
     \centering
-   % \includegraphics[width = \textwidth]{Fig4_AvocadoTreatmentEffect_V2.pdf}
     \includegraphics[width = \textwidth]{Figures/Fig4_AvocadoTreatmentEffect_V3.pdf}
     \caption{ Out of bag prediction of individualized treatment effect comparing avocado diet to control diet. The biomarkers, including diastolic blood pressure (DBP), systolic blood pressure (SBP), low-density lipoproteins cholesterol (LDL), and triglycerides (TG), are standardized. Each line represents an individual. K-mean clustering algorithm is applied to the predicted treatment effect of the 5 biomarkers, and generate 3 groups whose treatment effects of the five-dimensional outcome are similar within.}\label{AvocadoPlot}
 \end{figure}
-
-
-%\begin{figure}[h]
-%    \centering
-%    \includegraphics[width = \textwidth]{Fig5_AvocadoFI.pdf}
-%    \caption{Feature importance of the operational taxonomic units at the genus level in the avocado consumption data analysis}\label{AvocadoFI}
-%\end{figure}
 
 \begin{table}[h]
     \centering
